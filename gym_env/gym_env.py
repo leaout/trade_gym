@@ -22,7 +22,7 @@ class TradingGymEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self, df):
-        super(StockTradingEnv, self).__init__()
+        super(TradingGymEnv, self).__init__()
 
         self.df = df
         self.reward_range = (0, MAX_ACCOUNT_BALANCE)
@@ -33,23 +33,23 @@ class TradingGymEnv(gym.Env):
 
         # Prices contains the OHCL values for the last five prices
         self.observation_space = spaces.Box(
-            low=0, high=1, shape=(19,), dtype=np.float16)
+            low=0, high=1, shape=(12,), dtype=np.float16)
 
     def _next_observation(self):
         obs = np.array([
-            self.df.loc[self.current_step, 'open'] / MAX_SHARE_PRICE,
-            self.df.loc[self.current_step, 'high'] / MAX_SHARE_PRICE,
-            self.df.loc[self.current_step, 'low'] / MAX_SHARE_PRICE,
-            self.df.loc[self.current_step, 'close'] / MAX_SHARE_PRICE,
-            self.df.loc[self.current_step, 'volume'] / MAX_VOLUME,
-            self.df.loc[self.current_step, 'amount'] / MAX_AMOUNT,
-            self.df.loc[self.current_step, 'adjustflag'] / 10,
-            self.df.loc[self.current_step, 'tradestatus'] / 1,
-            self.df.loc[self.current_step, 'pctChg'] / 100,
-            self.df.loc[self.current_step, 'peTTM'] / 1e4,
-            self.df.loc[self.current_step, 'pbMRQ'] / 100,
-            self.df.loc[self.current_step, 'psTTM'] / 100,
-            self.df.loc[self.current_step, 'pctChg'] / 1e3,
+            self.df.loc[self.current_step, 'Open'] / MAX_SHARE_PRICE,
+            self.df.loc[self.current_step, 'High'] / MAX_SHARE_PRICE,
+            self.df.loc[self.current_step, 'Low'] / MAX_SHARE_PRICE,
+            self.df.loc[self.current_step, 'Close'] / MAX_SHARE_PRICE,
+            self.df.loc[self.current_step, 'Volume'] / MAX_VOLUME,
+            self.df.loc[self.current_step, 'Amount'] / MAX_AMOUNT,
+            # self.df.loc[self.current_step, 'adjustflag'] / 10,
+            # self.df.loc[self.current_step, 'tradestatus'] / 1,
+            # self.df.loc[self.current_step, 'pctChg'] / 100,
+            # self.df.loc[self.current_step, 'peTTM'] / 1e4,
+            # self.df.loc[self.current_step, 'pbMRQ'] / 100,
+            # self.df.loc[self.current_step, 'psTTM'] / 100,
+            # self.df.loc[self.current_step, 'pctChg'] / 1e3,
             self.balance / MAX_ACCOUNT_BALANCE,
             self.max_net_worth / MAX_ACCOUNT_BALANCE,
             self.shares_held / MAX_NUM_SHARES,
@@ -62,7 +62,7 @@ class TradingGymEnv(gym.Env):
     def _take_action(self, action):
         # Set the current price to a random price within the time step
         current_price = random.uniform(
-            self.df.loc[self.current_step, "open"], self.df.loc[self.current_step, "close"])
+            self.df.loc[self.current_step, "Open"], self.df.loc[self.current_step, "Close"])
 
         action_type = action[0]
         amount = action[1]
@@ -102,7 +102,7 @@ class TradingGymEnv(gym.Env):
 
         self.current_step += 1
 
-        if self.current_step > len(self.df.loc[:, 'open'].values) - 1:
+        if self.current_step > len(self.df.loc[:, 'Open'].values) - 1:
             self.current_step = 0  # loop training
             # done = True
 
